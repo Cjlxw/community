@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
  * @date 2022/9/19 16:27
  */
 @Controller
-public class HelloController {
+public class IndexController {
 
     @GetMapping("/")
     public String index(){
