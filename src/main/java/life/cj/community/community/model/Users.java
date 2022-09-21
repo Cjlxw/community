@@ -21,4 +21,6 @@ public class Users {
     private Long gmtCreate;
 
     private Long gmtModified;
+
+    private String bio;
 }
