@@ -1,6 +1,6 @@
 package life.cj.community.community.controller;
 
-import life.cj.community.community.mapper.PublishMapper;
+import life.cj.community.community.mapper.QuestionMapper;
 import life.cj.community.community.mapper.UserMapper;
 import life.cj.community.community.model.Question;
 import life.cj.community.community.model.Users;
@@ -9,7 +9,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -23,7 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 public class PublishController {
 
     @Autowired
-    private PublishMapper publishMapper;
+    private QuestionMapper questionMapper;
 
     @Autowired
     private UserMapper userMapper;
@@ -71,7 +70,7 @@ public class PublishController {
         question.setCreator(user.getId());
         question.setGmtCreate(System.currentTimeMillis());
         question.setGmtModified(question.getGmtCreate());
-        publishMapper.create(question);
+        questionMapper.create(question);
 
         return "redirect:/";
     }

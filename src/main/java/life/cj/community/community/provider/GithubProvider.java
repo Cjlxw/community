@@ -4,11 +4,9 @@ import com.alibaba.fastjson2.JSON;
 import life.cj.community.community.dto.AccessTokenDTO;
 import life.cj.community.community.dto.GithubUser;
 import okhttp3.*;
-import okhttp3.internal.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author cj

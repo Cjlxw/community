@@ -13,3 +13,8 @@ spring:
     username:
     password:
     url: jdbc:h2:~/community
+
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
