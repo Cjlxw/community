@@ -4,6 +4,7 @@ import life.cj.community.community.model.Page;
 import life.cj.community.community.model.Question;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -21,6 +22,12 @@ public interface QuestionMapper {
     @Select("select * from question limit (${pageNum}-1)*${pageSize}, #{pageSize}")
     List<Question> list(Page page);
 
+    @Select("select * from question where creator = #{userId} limit (${page.pageNum}-1)*${page.pageSize}, #{page.pageSize}")
+    List<Question> myList(@Param("userId") Integer userId, Page page);
+
     @Select("select count(1) from question")
     Integer count();
+
+    @Select("select count(1) from question where creator = #{userId}")
+    Integer countByUserId(@Param("userId") Integer userId);
 }
