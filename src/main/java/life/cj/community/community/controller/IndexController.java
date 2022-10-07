@@ -23,30 +23,28 @@ import javax.servlet.http.HttpServletRequest;
 public class IndexController {
 
     @Autowired
-    private UserMapper userMapper;
-
-    @Autowired
     private QuestionService questionService;
 
     @GetMapping("/")
-    public String index(HttpServletRequest request, Model model, Page page,
+    public String index(Model model,
+                        Page page,
                         @RequestParam(value = "pageNum",required = false) Integer pageNum){
         if (page.getPageSize() == null) {
             page.setPageNum(pageNum != null ? pageNum : 1);
             page.setPageSize(5);
         }
-        Cookie[] cookies = request.getCookies();
-        String token = "";
-        for (Cookie cookie : cookies) {
-            if ("token".equals(cookie.getName())) {
-                token = cookie.getValue();
-                Users user = userMapper.findByToken(token);
-                if (user != null) {
-                    request.getSession().setAttribute("user", user);
-                }
-                break;
-            }
-        }
+//        Cookie[] cookies = request.getCookies();
+//        String token = "";
+//        for (Cookie cookie : cookies) {
+//            if ("token".equals(cookie.getName())) {
+//                token = cookie.getValue();
+//                Users user = userMapper.findByToken(token);
+//                if (user != null) {
+//                    request.getSession().setAttribute("user", user);
+//                }
+//                break;
+//            }
+//        }
 
         PaginationDTO pagination = questionService.list(page);
         model.addAttribute("pagination", pagination);

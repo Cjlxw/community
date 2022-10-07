@@ -53,15 +53,15 @@ public class PublishController {
             return "publish";
         }
 
-        Cookie[] cookies = request.getCookies();
-        Users user = null;
-        for (Cookie cookie : cookies) {
-            if ("token".equals(cookie.getName())) {
-                String token = cookie.getValue();
-                user = userMapper.findByToken(token);
-                break;
-            }
-        }
+//        Cookie[] cookies = request.getCookies();
+        Users user = (Users) request.getSession().getAttribute("user");
+//        for (Cookie cookie : cookies) {
+//            if ("token".equals(cookie.getName())) {
+//                String token = cookie.getValue();
+//                user = userMapper.findByToken(token);
+//                break;
+//            }
+//        }
         if (user == null || "".equals(user.getAccountId())) {
             model.addAttribute("msg", "用户未登录!");
             return "publish";

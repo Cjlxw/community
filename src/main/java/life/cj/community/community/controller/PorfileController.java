@@ -35,22 +35,22 @@ public class PorfileController {
                            HttpServletRequest request,
                            Page page,
                            @RequestParam(value = "pageNum", required = false) Integer pageNum) {
-        Cookie[] cookies = request.getCookies();
-        String token = "";
-        Users user = null;
-        if (cookies != null && cookies.length != 0) {
-            for (Cookie cookie : cookies) {
-                if ("token".equals(cookie.getName())) {
-                    token = cookie.getValue();
-                    user = userMapper.findByToken(token);
-                    if (user != null) {
-                        request.getSession().setAttribute("user", user);
-                    }
-                    break;
-                }
-            }
-        }
+//        Cookie[] cookies = request.getCookies();
+//        String token = "";
+//        if (cookies != null && cookies.length != 0) {
+//            for (Cookie cookie : cookies) {
+//                if ("token".equals(cookie.getName())) {
+//                    token = cookie.getValue();
+//                    user = userMapper.findByToken(token);
+//                    if (user != null) {
+//                        request.getSession().setAttribute("user", user);
+//                    }
+//                    break;
+//                }
+//            }
+//        }
 
+        Users user = (Users) request.getSession().getAttribute("user");
         if (user == null) {
             return "redirect:/";
         }
