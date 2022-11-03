@@ -2,6 +2,8 @@ package life.cj.community.community.service;
 
 import life.cj.community.community.dto.PaginationDTO;
 import life.cj.community.community.dto.QuestionDTO;
+import life.cj.community.community.exception.CustomizeErrorCode;
+import life.cj.community.community.exception.CustomizeException;
 import life.cj.community.community.mapper.QuestionMapper;
 import life.cj.community.community.mapper.UserMapper;
 import life.cj.community.community.mapper.UsersMapper;
@@ -100,6 +102,9 @@ public class QuestionService {
 
     public QuestionDTO getById(Integer id) {
         Question question = questionMapper.selectByPrimaryKey(id);
+        if (question == null) {
+            throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
+        }
         QuestionDTO questionDTO = new QuestionDTO();
         BeanUtils.copyProperties(question, questionDTO);
         UsersExample usersExample = new UsersExample();
@@ -124,7 +129,10 @@ public class QuestionService {
             newQuestion.setTag(question.getTag());
             newQuestion.setTitle(question.getTitle());
             newQuestion.setDescription(question.getDescription());
-            questionMapper.updateByPrimaryKeySelective(newQuestion);
+            int update = questionMapper.updateByPrimaryKeySelective(newQuestion);
+            if (update != 1) {
+                throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
+            }
         }
     }
 }

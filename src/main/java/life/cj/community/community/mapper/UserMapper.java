@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.*;
  * @apiNote TODO
  * @date 2022/9/21 14:07
  */
+@Deprecated
 @Mapper
 public interface UserMapper {
 
