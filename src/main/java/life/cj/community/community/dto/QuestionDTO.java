@@ -2,7 +2,6 @@ package life.cj.community.community.dto;
 
 import life.cj.community.community.model.Users;
 import lombok.Data;
-import lombok.ToString;
 
 /**
  * @author cj

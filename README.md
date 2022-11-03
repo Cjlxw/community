@@ -9,3 +9,6 @@
 
 ##工具
 [visual paradigm](https://www.visual-paradigm.com)
+
+
+mvn -Dmybatis.generator.overwrite=true mybatis-generator:generate

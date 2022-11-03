@@ -33,18 +33,6 @@ public class IndexController {
             page.setPageNum(pageNum != null ? pageNum : 1);
             page.setPageSize(5);
         }
-//        Cookie[] cookies = request.getCookies();
-//        String token = "";
-//        for (Cookie cookie : cookies) {
-//            if ("token".equals(cookie.getName())) {
-//                token = cookie.getValue();
-//                Users user = userMapper.findByToken(token);
-//                if (user != null) {
-//                    request.getSession().setAttribute("user", user);
-//                }
-//                break;
-//            }
-//        }
 
         PaginationDTO pagination = questionService.list(page);
         model.addAttribute("pagination", pagination);

@@ -1,10 +1,7 @@
 package life.cj.community.community.mapper;
 
 import life.cj.community.community.model.Users;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 /**
  * @author cj
@@ -22,4 +19,11 @@ public interface UserMapper {
 
     @Select("select * from users where id = #{id}")
     Users findById(@Param("id") Integer id);
+
+
+    @Select("select * from users where account_id = #{accountId}")
+    Users findByAccountId(@Param("accountId") String accountId);
+
+    @Update("update users set gmt_modified = #{gmtModified}, avatar_url = #{avatarUrl}, token = #{token}, name = #{name} where account_id = #{accountId}")
+    void update(Users dbUser);
 }

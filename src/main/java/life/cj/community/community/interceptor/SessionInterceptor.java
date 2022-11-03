@@ -1,7 +1,9 @@
 package life.cj.community.community.interceptor;
 
 import life.cj.community.community.mapper.UserMapper;
+import life.cj.community.community.mapper.UsersMapper;
 import life.cj.community.community.model.Users;
+import life.cj.community.community.model.UsersExample;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -10,6 +12,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * @author cj
@@ -20,7 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 public class SessionInterceptor implements HandlerInterceptor {
 
     @Autowired
-    private UserMapper userMapper;
+    private UsersMapper usersMapper;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -30,9 +33,12 @@ public class SessionInterceptor implements HandlerInterceptor {
             for (Cookie cookie : cookies) {
                 if ("token".equals(cookie.getName())) {
                     token = cookie.getValue();
-                    Users user = userMapper.findByToken(token);
-                    if (user != null) {
-                        request.getSession().setAttribute("user", user);
+                    UsersExample usersExample = new UsersExample();
+                    usersExample.createCriteria()
+                            .andTokenEqualTo(token);
+                    List<Users> user = usersMapper.selectByExample(usersExample);
+                    if (user.size() != 0) {
+                        request.getSession().setAttribute("user", user.get(0));
                     }
                     break;
                 }

@@ -4,12 +4,13 @@ import life.cj.community.community.dto.PaginationDTO;
 import life.cj.community.community.dto.QuestionDTO;
 import life.cj.community.community.mapper.QuestionMapper;
 import life.cj.community.community.mapper.UserMapper;
-import life.cj.community.community.model.Page;
-import life.cj.community.community.model.Question;
-import life.cj.community.community.model.Users;
+import life.cj.community.community.mapper.UsersMapper;
+import life.cj.community.community.model.*;
+import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,13 +24,13 @@ import java.util.List;
 public class QuestionService {
 
     @Autowired
-    private UserMapper userMapper;
+    private UsersMapper usersMapper;
 
     @Autowired
     private QuestionMapper questionMapper;
 
     public PaginationDTO list(Page page) {
-        Integer count = questionMapper.count();
+        Integer count = (int) questionMapper.countByExample(new QuestionExample());
         if (page.getPageNum() < 1) {
             page.setPageNum(1);
         }
@@ -39,12 +40,17 @@ public class QuestionService {
         if (page.getPageNum() > size) {
             page.setPageNum(size);
         }
-        List<Question> questionList = questionMapper.list(page);
+        QuestionExample questionExample = new QuestionExample();
+        questionExample.setOrderByClause("gmt_create desc");
+        List<Question> questionList = questionMapper.selectByExampleWithRowbounds(questionExample, new RowBounds((page.getPageNum() - 1) * page.getPageSize(),page.getPageSize()));
         List<QuestionDTO> questionDTOList = new ArrayList<>();
         PaginationDTO paginationDTO = new PaginationDTO();
 
         for (Question question : questionList) {
-            Users user = userMapper.findById(question.getCreator());
+            UsersExample usersExample = new UsersExample();
+            usersExample.createCriteria().
+                    andIdEqualTo(question.getCreator());
+            Users user = usersMapper.selectByExample(usersExample).get(0);
             QuestionDTO questionDTO = new QuestionDTO();
             questionDTO.setUser(user);
             BeanUtils.copyProperties(question,questionDTO);
@@ -57,7 +63,7 @@ public class QuestionService {
     }
 
     public PaginationDTO list(Integer userId, Page page) {
-        Integer count = questionMapper.countByUserId(userId);
+        Integer count = (int) questionMapper.countByExample(new QuestionExample());
         if (page.getPageNum() < 1) {
             page.setPageNum(1);
         }
@@ -67,12 +73,20 @@ public class QuestionService {
         if (page.getPageNum() > size) {
             page.setPageNum(size);
         }
-        List<Question> questionList = questionMapper.myList(userId, page);
+        QuestionExample questionExample = new QuestionExample();
+        questionExample.createCriteria()
+                .andCreatorEqualTo(userId);
+        questionExample.setOrderByClause("gmt_create desc");
+        List<Question> questionList =
+                questionMapper.selectByExampleWithRowbounds(questionExample, new RowBounds((page.getPageNum() - 1) * page.getPageSize(), page.getPageSize()));
         List<QuestionDTO> questionDTOList = new ArrayList<>();
         PaginationDTO paginationDTO = new PaginationDTO();
 
         for (Question question : questionList) {
-            Users user = userMapper.findById(question.getCreator());
+            UsersExample usersExample = new UsersExample();
+            usersExample.createCriteria().
+                    andIdEqualTo(question.getCreator());
+            Users user = usersMapper.selectByExample(usersExample).get(0);
             QuestionDTO questionDTO = new QuestionDTO();
             questionDTO.setUser(user);
             BeanUtils.copyProperties(question,questionDTO);
@@ -82,5 +96,35 @@ public class QuestionService {
         paginationDTO.setList(questionDTOList);
         paginationDTO.setParam(count, page);
         return paginationDTO;
+    }
+
+    public QuestionDTO getById(Integer id) {
+        Question question = questionMapper.selectByPrimaryKey(id);
+        QuestionDTO questionDTO = new QuestionDTO();
+        BeanUtils.copyProperties(question, questionDTO);
+        UsersExample usersExample = new UsersExample();
+        usersExample.createCriteria().
+                andIdEqualTo(question.getCreator());
+        Users user = usersMapper.selectByExample(usersExample).get(0);
+        questionDTO.setUser(user);
+        return questionDTO;
+    }
+
+    public void createOrUpdate(Question question) {
+        if (ObjectUtils.isEmpty(question.getId())) {
+            //create
+            question.setGmtCreate(System.currentTimeMillis());
+            question.setGmtModified(question.getGmtCreate());
+            questionMapper.insert(question);
+        } else {
+            //update
+            Question newQuestion = new Question();
+            newQuestion.setId(question.getId());
+            newQuestion.setGmtModified(System.currentTimeMillis());
+            newQuestion.setTag(question.getTag());
+            newQuestion.setTitle(question.getTitle());
+            newQuestion.setDescription(question.getDescription());
+            questionMapper.updateByPrimaryKeySelective(newQuestion);
+        }
     }
 }

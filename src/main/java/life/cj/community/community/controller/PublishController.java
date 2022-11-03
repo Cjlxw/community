@@ -1,14 +1,18 @@
 package life.cj.community.community.controller;
 
+import life.cj.community.community.dto.QuestionDTO;
 import life.cj.community.community.mapper.QuestionMapper;
 import life.cj.community.community.mapper.UserMapper;
 import life.cj.community.community.model.Question;
 import life.cj.community.community.model.Users;
+import life.cj.community.community.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -22,10 +26,19 @@ import javax.servlet.http.HttpServletRequest;
 public class PublishController {
 
     @Autowired
-    private QuestionMapper questionMapper;
+    private QuestionService questionService;
 
-    @Autowired
-    private UserMapper userMapper;
+    @GetMapping("/publish/{id}")
+    public String edit(@PathVariable("id") Integer id,
+                       Model model){
+        QuestionDTO question = questionService.getById(id);
+
+        model.addAttribute("title", question.getTitle().trim());
+        model.addAttribute("description", question.getDescription().trim());
+        model.addAttribute("tag", question.getTag().trim());
+        model.addAttribute("id", question.getId());
+        return "publish";
+    }
 
     @GetMapping("/publish")
     public String publish() {
@@ -34,6 +47,7 @@ public class PublishController {
 
     @PostMapping("/publish")
     public String doPublish(Question question,
+                            @RequestParam(name = "id", required = false) Integer id,
                             HttpServletRequest request,
                             Model model) {
         model.addAttribute("title", question.getTitle());
@@ -53,24 +67,16 @@ public class PublishController {
             return "publish";
         }
 
-//        Cookie[] cookies = request.getCookies();
         Users user = (Users) request.getSession().getAttribute("user");
-//        for (Cookie cookie : cookies) {
-//            if ("token".equals(cookie.getName())) {
-//                String token = cookie.getValue();
-//                user = userMapper.findByToken(token);
-//                break;
-//            }
-//        }
+
         if (user == null || "".equals(user.getAccountId())) {
             model.addAttribute("msg", "用户未登录!");
             return "publish";
         }
 
         question.setCreator(user.getId());
-        question.setGmtCreate(System.currentTimeMillis());
-        question.setGmtModified(question.getGmtCreate());
-        questionMapper.create(question);
+        question.setId(id);
+        questionService.createOrUpdate(question);
 
         return "redirect:/";
     }
